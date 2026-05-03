@@ -623,6 +623,16 @@
         return typeof value === "string" ? value : fallback;
       }
 
+      function withCacheBuster(url) {
+        const u = String(url || "");
+        if (!u) return u;
+        if (/^https?:\/\//i.test(u) || /^mailto:/i.test(u)) return u;
+        if (/\.(png|jpe?g|gif|webp)$/i.test(u)) {
+          return `${u}${u.includes("?") ? "&" : "?"}v=${Date.now()}`;
+        }
+        return u;
+      }
+
       function escapeHtml(input) {
         return String(input)
           .replaceAll("&", "&amp;")
@@ -712,7 +722,7 @@
             if (url) {
               const a = document.createElement("a");
               a.className = "item job-link";
-              a.href = url;
+              a.href = withCacheBuster(url);
               a.target = "_blank";
               a.rel = "noreferrer";
 
