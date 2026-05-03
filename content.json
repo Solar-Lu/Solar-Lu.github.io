@@ -14,15 +14,7 @@
     {
       "id": "projects",
       "title": "Projects",
-      "body": ["Research progress: 0. Does a 1:52 half marathon count?"],
-      "items": [
-        {
-          "name": "Marathons",
-          "description": "A half marathon in 1:52.",
-          "tags": ["Running"],
-          "url": "./figs/?photo=marathon.jpg"
-        }
-      ]
+      "body": ["Research progress: 0. Does a 1:52h half marathon count?"]
     },
     {
       "id": "writing",
@@ -62,6 +54,6 @@
     "repo": "Solar-Lu/Solar-Lu.github.io",
     "label": "suggestion",
     "newIssueTitle": "Suggestion for SolarLu",
-    "placeholder": "Write a suggestion… (opens a GitHub issue)"
+    "placeholder": "Write a suggestion…"
   }
 }

@@ -769,34 +769,17 @@
 
         const comments = data?.comments || null;
         if (comments?.repo) {
-          const section = document.createElement("section");
-          section.className = "section";
-
-          const header = document.createElement("div");
-          header.className = "h";
-          const h2 = document.createElement("h2");
-          h2.textContent = safeText(comments.title, "Comments");
-          header.appendChild(h2);
-
-          const view = document.createElement("a");
-          view.href = `https://github.com/${safeText(comments.repo).trim()}/issues`;
-          view.target = "_blank";
-          view.rel = "noreferrer";
-          view.textContent = "View";
-          header.appendChild(view);
-          section.appendChild(header);
-
           const p = document.createElement("p");
           p.className = "p";
-          p.textContent =
-            "Please Leave a suggestion...🙏🙏🙏";
-          section.appendChild(p);
+          p.style.marginTop = "0";
+          p.textContent = safeText(comments.title, "Comments") + ":";
+          root.appendChild(p);
 
           const textarea = document.createElement("textarea");
           textarea.className = "text-area";
           textarea.placeholder = safeText(comments.placeholder, "Write a suggestion…");
           textarea.maxLength = 2000;
-          section.appendChild(textarea);
+          root.appendChild(textarea);
 
           const row = document.createElement("div");
           row.className = "btn-row";
@@ -813,7 +796,10 @@
               return;
             }
             const issueTitle = safeText(comments.newIssueTitle, "Suggestion");
-            const body = `${message}\n\n---\nFrom: ${window.location.href}`;
+            const body =
+              message +
+              "\n\n---\nFrom: " +
+              window.location.href;
             openNewIssue({
               repo: comments.repo,
               title: issueTitle,
@@ -826,13 +812,11 @@
 
           const hint = document.createElement("span");
           hint.className = "subtle";
-          hint.textContent = `Repo: ${safeText(comments.repo)}`;
+          hint.textContent = "via GitHub Issues";
           row.appendChild(hint);
 
-          section.appendChild(row);
-          root.appendChild(section);
+          root.appendChild(row);
         }
-      }
 
       function renderSections(sections) {
         const root = $("#content");
