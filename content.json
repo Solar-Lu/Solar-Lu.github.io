@@ -40,7 +40,11 @@
   },
   "career": {
     "title": "If I can graduate, my dream jobs",
-    "items": ["🍦Gelato shop staff", "🛒Hema shelf stocker"]
+    "items": [
+      { "label": "🍦 Gelato shop staff", "url": "figs/gelato.jpg" },
+      { "label": "☕ Miracle coffee shop staff", "url": "figs/miracle.jpg" },
+      { "label": "wo'r'kJFJ staff", "url": "https://www.jfjproductions.com/" }
+    ]
   },
   "comments": {
     "title": "🙋‍Comments & Suggestions",

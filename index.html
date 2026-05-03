@@ -185,7 +185,7 @@
         display: grid;
         grid-template-columns: 420px 1fr;
         gap: 18px;
-        align-items: start;
+        align-items: stretch;
       }
 
       @media (max-width: 980px) {
@@ -201,6 +201,7 @@
         background: color-mix(in srgb, var(--panel) 100%, transparent);
         box-shadow: var(--shadow);
         overflow: hidden;
+        height: 100%;
       }
 
       .hero {
@@ -244,6 +245,79 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
+      }
+
+      .details {
+        padding: 0;
+      }
+
+      .details > summary {
+        list-style: none;
+      }
+
+      .details > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .details-summary {
+        padding: 16px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .details-summary h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: 0.2px;
+      }
+
+      .details-summary::after {
+        content: "▾";
+        color: var(--muted);
+        font-size: 14px;
+        transform: rotate(-90deg);
+        transition: transform 160ms ease;
+      }
+
+      details[open] > .details-summary::after {
+        transform: rotate(0deg);
+      }
+
+      .details-body {
+        padding: 0 16px 16px;
+        border-top: 1px solid var(--border);
+      }
+
+      .job-link {
+        display: block;
+        text-decoration: none;
+      }
+
+      .job-link:hover {
+        text-decoration: none;
+        border-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+      }
+
+      .job-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .job-text {
+        font-weight: 650;
+      }
+
+      .job-arrow {
+        color: var(--muted);
+        font-size: 12px;
+        opacity: 0.8;
+        flex: 0 0 auto;
       }
 
       .text-area {
@@ -604,34 +678,74 @@
         root.innerHTML = "";
 
         const career = data?.career || null;
-        const careerItems = Array.isArray(career?.items) ? career.items : [];
-        if (career && careerItems.length) {
-          const section = document.createElement("section");
-          section.className = "section";
+        const careerItemsRaw = Array.isArray(career?.items) ? career.items : [];
+        const careerItems = careerItemsRaw
+          .map((it) => {
+            if (typeof it === "string") return { label: it, url: "" };
+            if (!it || typeof it !== "object") return null;
+            return {
+              label: safeText(it.label, safeText(it.name, "")),
+              url: safeText(it.url, safeText(it.href, "")),
+            };
+          })
+          .filter((it) => it && it.label);
 
-          const header = document.createElement("div");
-          header.className = "h";
+        if (career && careerItems.length) {
+          const details = document.createElement("details");
+          details.className = "section details";
+          details.open = true;
+
+          const summary = document.createElement("summary");
+          summary.className = "details-summary";
           const h2 = document.createElement("h2");
           h2.textContent = safeText(career.title, "Career");
-          header.appendChild(h2);
-          section.appendChild(header);
+          summary.appendChild(h2);
+          details.appendChild(summary);
+
+          const body = document.createElement("div");
+          body.className = "details-body";
 
           const list = document.createElement("div");
           list.className = "list";
           for (const item of careerItems) {
-            const card = document.createElement("div");
-            card.className = "item";
-            const titleRow = document.createElement("div");
-            titleRow.className = "item-title";
-            const name = document.createElement("span");
-            name.textContent = String(item);
-            name.style.fontWeight = "650";
-            titleRow.appendChild(name);
-            card.appendChild(titleRow);
-            list.appendChild(card);
+            const url = safeText(item.url, "").trim();
+            if (url) {
+              const a = document.createElement("a");
+              a.className = "item job-link";
+              a.href = url;
+              a.target = "_blank";
+              a.rel = "noreferrer";
+
+              const row = document.createElement("div");
+              row.className = "job-row";
+              const text = document.createElement("span");
+              text.className = "job-text";
+              text.textContent = String(item.label);
+              row.appendChild(text);
+              const arrow = document.createElement("span");
+              arrow.className = "job-arrow";
+              arrow.textContent = "↗";
+              row.appendChild(arrow);
+
+              a.appendChild(row);
+              list.appendChild(a);
+            } else {
+              const card = document.createElement("div");
+              card.className = "item";
+              const row = document.createElement("div");
+              row.className = "job-row";
+              const text = document.createElement("span");
+              text.className = "job-text";
+              text.textContent = String(item.label);
+              row.appendChild(text);
+              card.appendChild(row);
+              list.appendChild(card);
+            }
           }
-          section.appendChild(list);
-          root.appendChild(section);
+
+          body.appendChild(list);
+          details.appendChild(body);
+          root.appendChild(details);
         }
 
         const comments = data?.comments || null;
