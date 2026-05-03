@@ -276,11 +276,20 @@
       }
 
       .details-summary::after {
-        content: "▾";
-        color: var(--muted);
-        font-size: 14px;
+        content: "▼";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 26px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: color-mix(in srgb, var(--panel-strong) 70%, transparent);
+        color: var(--text);
+        font-size: 13px;
+        line-height: 1;
         transform: rotate(-90deg);
-        transition: transform 160ms ease;
+        transition: transform 160ms ease, background 160ms ease;
       }
 
       details[open] > .details-summary::after {

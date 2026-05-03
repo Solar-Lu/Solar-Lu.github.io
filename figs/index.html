@@ -221,6 +221,7 @@
         overflow: hidden;
         cursor: zoom-in;
         position: relative;
+        display: block;
       }
 
       @media (max-width: 980px) {
@@ -308,29 +309,6 @@
         line-height: 1.5;
         min-height: 20px;
       }
-
-      .toast {
-        position: fixed;
-        left: 50%;
-        bottom: 18px;
-        transform: translateX(-50%);
-        background: color-mix(in srgb, var(--bg) 74%, transparent);
-        border: 1px solid var(--border);
-        color: var(--text);
-        padding: 10px 12px;
-        border-radius: 999px;
-        backdrop-filter: blur(14px);
-        font-size: 13px;
-        box-shadow: var(--shadow);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 180ms ease;
-        z-index: 30;
-      }
-
-      .toast.show {
-        opacity: 1;
-      }
     </style>
   </head>
   <body>
@@ -352,10 +330,7 @@
         <p class="sub" id="pageSub"></p>
       </div>
       <div id="grid" class="grid" aria-live="polite"></div>
-      <div id="empty" class="empty" hidden>
-        No photos yet. Put images into the <b>/figs</b> folder and list them in
-        <b>content.json</b> under <b>photos.items</b>.
-      </div>
+      <div id="empty" class="empty" hidden>No photos yet.</div>
     </main>
 
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Photo viewer">
@@ -368,21 +343,9 @@
       </div>
     </div>
 
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
     <script>
       const $ = (sel) => document.querySelector(sel);
       const storageKey = "solar-theme";
-
-      const toastEl = $("#toast");
-      function showToast(message) {
-        toastEl.textContent = message;
-        toastEl.classList.add("show");
-        window.clearTimeout(showToast._t);
-        showToast._t = window.setTimeout(() => {
-          toastEl.classList.remove("show");
-        }, 1200);
-      }
 
       function setTheme(mode) {
         if (!mode) {
@@ -398,7 +361,6 @@
         const current = document.documentElement.getAttribute("data-theme");
         const next = current === "dark" ? "light" : "dark";
         setTheme(next);
-        showToast(`Theme: ${next}`);
       }
 
       const saved = localStorage.getItem(storageKey);
@@ -409,16 +371,35 @@
         return typeof value === "string" ? value : fallback;
       }
 
+      function baseName(path) {
+        const s = String(path || "");
+        const parts = s.split("/");
+        return parts[parts.length - 1] || s;
+      }
+
       function resolveFromRoot(path) {
         const rootBase = new URL("../", window.location.href);
         return new URL(String(path || ""), rootBase).toString();
       }
 
-      function openModal(src, alt, caption) {
-        $("#modalImg").src = src;
+      function imageUrl(path) {
+        const u = resolveFromRoot(path);
+        return `${u}${u.includes("?") ? "&" : "?"}v=${Date.now()}`;
+      }
+
+      function setSelectedPhotoParam(fileName) {
+        const url = new URL(window.location.href);
+        if (fileName) url.searchParams.set("photo", fileName);
+        else url.searchParams.delete("photo");
+        history.replaceState(null, "", url.toString());
+      }
+
+      function openModal(srcRaw, alt, caption) {
+        $("#modalImg").src = imageUrl(srcRaw);
         $("#modalImg").alt = alt || "";
         $("#modalCap").textContent = caption || "";
         $("#modal").classList.add("show");
+        setSelectedPhotoParam(baseName(srcRaw));
       }
 
       function closeModal() {
@@ -426,6 +407,7 @@
         $("#modalImg").src = "";
         $("#modalImg").alt = "";
         $("#modalCap").textContent = "";
+        setSelectedPhotoParam("");
       }
 
       $("#closeBtn").addEventListener("click", closeModal);
@@ -443,6 +425,7 @@
       }
 
       (async () => {
+        const selected = new URLSearchParams(window.location.search).get("photo");
         try {
           const data = await loadContent();
           const siteTitle = safeText(data?.site?.title, "Home");
@@ -459,41 +442,46 @@
           const grid = $("#grid");
           grid.innerHTML = "";
 
+          let selectedItem = null;
           for (const item of items) {
             const srcRaw = safeText(item?.src, "");
             if (!srcRaw) continue;
-            const src = resolveFromRoot(srcRaw);
             const alt = safeText(item?.alt, "");
             const caption = safeText(item?.caption, "");
+            const file = baseName(srcRaw);
+            if (selected && file === selected) selectedItem = { srcRaw, alt, caption };
 
-            const tile = document.createElement("div");
-            tile.className = "tile";
-            tile.tabIndex = 0;
+            const a = document.createElement("a");
+            a.className = "tile";
+            a.href = `?photo=${encodeURIComponent(file)}`;
 
             const img = document.createElement("img");
             img.loading = "lazy";
             img.decoding = "async";
-            img.src = src;
+            img.src = imageUrl(srcRaw);
             img.alt = alt;
-            tile.appendChild(img);
+            a.appendChild(img);
 
             if (caption) {
               const cap = document.createElement("div");
               cap.className = "cap";
               cap.textContent = caption;
-              tile.appendChild(cap);
+              a.appendChild(cap);
             }
 
-            const open = () => openModal(src, alt, caption);
-            tile.addEventListener("click", open);
-            tile.addEventListener("keydown", (e) => {
-              if (e.key === "Enter" || e.key === " ") open();
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              openModal(srcRaw, alt, caption);
             });
 
-            grid.appendChild(tile);
+            grid.appendChild(a);
           }
 
           $("#empty").hidden = items.length !== 0;
+
+          if (selectedItem) {
+            setTimeout(() => openModal(selectedItem.srcRaw, selectedItem.alt, selectedItem.caption), 30);
+          }
         } catch (err) {
           $("#empty").hidden = false;
           $("#pageSub").textContent = "Failed to load content.json.";

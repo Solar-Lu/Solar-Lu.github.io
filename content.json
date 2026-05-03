@@ -14,7 +14,15 @@
     {
       "id": "projects",
       "title": "Projects",
-      "body": ["Research progress: 0. Does a 1:50 half marathon count?"]
+      "body": ["Research progress: 0. Does a 1:52 half marathon count?"],
+      "items": [
+        {
+          "name": "Marathons",
+          "description": "A half marathon in 1:52.",
+          "tags": ["Running"],
+          "url": "./figs/?photo=marathon.jpg"
+        }
+      ]
     },
     {
       "id": "writing",
@@ -35,15 +43,18 @@
         "src": "figs/xin'an river.jpg",
         "alt": "Xin'an River",
         "caption": "Xin'an River"
-      }
+      },
+      { "src": "figs/gelato.jpg", "alt": "Gelato", "caption": "Gelato" },
+      { "src": "figs/miracle.jpg", "alt": "Miracle", "caption": "Miracle" },
+      { "src": "figs/marathon.jpg", "alt": "Marathon", "caption": "Marathon" }
     ]
   },
   "career": {
-    "title": "If I can graduate, my dream jobs",
+    "title": "If I can graduate, my dream jobs...",
     "items": [
-      { "label": "🍦 Gelato shop staff", "url": "figs/gelato.jpg" },
-      { "label": "☕ Miracle coffee shop staff", "url": "figs/miracle.jpg" },
-      { "label": "wo'r'kJFJ staff", "url": "https://www.jfjproductions.com/" }
+      { "label": "🍦 Gelato shop staff", "url": "./figs/?photo=gelato.jpg" },
+      { "label": "☕ Miracle coffee shop staff", "url": "./figs/?photo=miracle.jpg" },
+      { "label": "🧛‍♀️ JFJ staff", "url": "https://www.jfjproductions.com/" }
     ]
   },
   "comments": {
