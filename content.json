@@ -39,11 +39,11 @@
     ]
   },
   "career": {
-    "title": "If I graduate, my dream jobs after graduation",
-    "items": ["Gelato shop staff", "Hema shelf stocker"]
+    "title": "If I can graduate, my dream jobs",
+    "items": ["🍦Gelato shop staff", "🛒Hema shelf stocker"]
   },
   "comments": {
-    "title": "Comments & Suggestions",
+    "title": "🙋‍Comments & Suggestions",
     "repo": "Solar-Lu/Solar-Lu.github.io",
     "label": "suggestion",
     "newIssueTitle": "Suggestion for SolarLu",
