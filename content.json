@@ -1,0 +1,34 @@
+{
+  "site": {
+    "title": "SolarLu",
+    "tagline": "Hurry slowly; bad things won't come.",
+    "location": "🌍 After graduation: globally mobile",
+    "email": "shu58905@gmail.com"
+  },
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/SolarLu" },
+    { "label": "Email", "url": "mailto:shu58905@gmail.com" },
+    { "label": "Photos", "url": "./figs/" }
+  ],
+  "sections": [
+    {
+      "id": "projects",
+      "title": "Projects",
+      "body": ["Research progress: 0. Does a 1:50 half marathon count?"]
+    },
+    {
+      "id": "writing",
+      "title": "Writing",
+      "body": [],
+      "items": []
+    }
+  ],
+  "planets": [
+    { "label": "Projects", "target": "projects" },
+    { "label": "Writing", "target": "writing" }
+  ],
+  "photos": {
+    "title": "Photos",
+    "items": []
+  }
+}
