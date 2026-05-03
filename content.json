@@ -29,6 +29,13 @@
   ],
   "photos": {
     "title": "Photos",
-    "items": []
+    "items": [
+      { "src": "figs/loopy.jpg", "alt": "loopy", "caption": "loopy" },
+      {
+        "src": "figs/xin'an river.jpg",
+        "alt": "Xin'an River",
+        "caption": "Xin'an River"
+      }
+    ]
   }
 }
