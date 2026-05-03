@@ -239,6 +239,47 @@
         gap: 10px;
       }
 
+      .aside-extra {
+        margin-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .text-area {
+        width: 100%;
+        min-height: 92px;
+        resize: vertical;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--panel-strong) 60%, transparent);
+        color: var(--text);
+        padding: 10px 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        outline: none;
+      }
+
+      .text-area:focus {
+        border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+      }
+
+      .btn-row {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .subtle {
+        color: var(--muted2);
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 8px 0 0;
+      }
+
       .link-pill {
         display: inline-flex;
         align-items: center;
@@ -443,6 +484,7 @@
         <div class="meta" id="meta"></div>
         <div class="divider"></div>
         <div class="links" id="links"></div>
+        <div class="aside-extra" id="asideExtra"></div>
       </aside>
 
       <div class="card scene">
@@ -543,6 +585,119 @@
           span.className = "chip";
           span.textContent = text;
           meta.appendChild(span);
+        }
+      }
+
+      function openNewIssue({ repo, title, body, label }) {
+        const repoSlug = safeText(repo).trim();
+        if (!repoSlug) return;
+        const params = new URLSearchParams();
+        if (title) params.set("title", title);
+        if (body) params.set("body", body);
+        if (label) params.set("labels", label);
+        const url = `https://github.com/${repoSlug}/issues/new?${params.toString()}`;
+        window.open(url, "_blank", "noreferrer");
+      }
+
+      function renderAsideExtras(data) {
+        const root = $("#asideExtra");
+        root.innerHTML = "";
+
+        const career = data?.career || null;
+        const careerItems = Array.isArray(career?.items) ? career.items : [];
+        if (career && careerItems.length) {
+          const section = document.createElement("section");
+          section.className = "section";
+
+          const header = document.createElement("div");
+          header.className = "h";
+          const h2 = document.createElement("h2");
+          h2.textContent = safeText(career.title, "Career");
+          header.appendChild(h2);
+          section.appendChild(header);
+
+          const list = document.createElement("div");
+          list.className = "list";
+          for (const item of careerItems) {
+            const card = document.createElement("div");
+            card.className = "item";
+            const titleRow = document.createElement("div");
+            titleRow.className = "item-title";
+            const name = document.createElement("span");
+            name.textContent = String(item);
+            name.style.fontWeight = "650";
+            titleRow.appendChild(name);
+            card.appendChild(titleRow);
+            list.appendChild(card);
+          }
+          section.appendChild(list);
+          root.appendChild(section);
+        }
+
+        const comments = data?.comments || null;
+        if (comments?.repo) {
+          const section = document.createElement("section");
+          section.className = "section";
+
+          const header = document.createElement("div");
+          header.className = "h";
+          const h2 = document.createElement("h2");
+          h2.textContent = safeText(comments.title, "Comments");
+          header.appendChild(h2);
+
+          const view = document.createElement("a");
+          view.href = `https://github.com/${safeText(comments.repo).trim()}/issues`;
+          view.target = "_blank";
+          view.rel = "noreferrer";
+          view.textContent = "View";
+          header.appendChild(view);
+          section.appendChild(header);
+
+          const p = document.createElement("p");
+          p.className = "p";
+          p.textContent =
+            "Leave a suggestion. This opens a GitHub issue (requires a GitHub account).";
+          section.appendChild(p);
+
+          const textarea = document.createElement("textarea");
+          textarea.className = "text-area";
+          textarea.placeholder = safeText(comments.placeholder, "Write a suggestion…");
+          textarea.maxLength = 2000;
+          section.appendChild(textarea);
+
+          const row = document.createElement("div");
+          row.className = "btn-row";
+
+          const send = document.createElement("button");
+          send.className = "btn";
+          send.type = "button";
+          send.textContent = "Send";
+          send.addEventListener("click", () => {
+            const message = textarea.value.trim();
+            if (!message) {
+              showToast("Write something first");
+              textarea.focus();
+              return;
+            }
+            const issueTitle = safeText(comments.newIssueTitle, "Suggestion");
+            const body = `${message}\n\n---\nFrom: ${window.location.href}`;
+            openNewIssue({
+              repo: comments.repo,
+              title: issueTitle,
+              body,
+              label: safeText(comments.label, ""),
+            });
+            showToast("Opening GitHub…");
+          });
+          row.appendChild(send);
+
+          const hint = document.createElement("span");
+          hint.className = "subtle";
+          hint.textContent = `Repo: ${safeText(comments.repo)}`;
+          row.appendChild(hint);
+
+          section.appendChild(row);
+          root.appendChild(section);
         }
       }
 
@@ -942,6 +1097,7 @@
 
           renderMeta(site);
           renderLinks(data.links);
+          renderAsideExtras(data);
           renderSections(data.sections);
 
           const planets = normalizePlanets(data.planets, data.sections);
